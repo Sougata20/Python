@@ -1,0 +1,185 @@
+1. Basic Parent-Child Relationship (Binary Tree)
+% Facts
+parent(john, mary).
+parent(john, tom).
+parent(mary, alice).
+parent(mary, bob).
+parent(tom, charlie).
+% Rules
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
+% Queries
+?- ancestor(john, alice).
+true .
+
+?- ancestor(mary, bob).
+true .
+
+2. Sibling Relationship
+% Facts
+parent(john, mary).
+parent(john, tom).
+% Rules
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y.
+% Queries
+?- sibling(mary, tom).
+true.
+
+3. Descendant Relation
+% Facts
+parent(anne, brian).
+parent(anne, chris).
+parent(brian, david).
+% Rules
+descendant(X, Y) :- parent(Y, X).
+descendant(X, Y) :- parent(Z, X), descendant(Z, Y).
+?- descendant(david, anne).
+true .
+
+4. Leaf Node Detection
+% Facts
+parent(alice, bob).
+parent(bob, charlie).
+parent(bob, diana).
+% Rules
+leaf(X) :- parent(_, X), \+ parent(X, _).
+% Queries
+?- leaf(charlie).
+true.
+
+5. Height of Binary Tree
+% Facts
+parent(a, b).
+parent(a, c).
+parent(b, d).
+parent(b, e).
+parent(c, f).
+% Rules
+height(nil, 0).
+height(X, H) :- parent(X, L), parent(X, R), height(L, LH), height(R, RH), H is max(LH, RH) + 1.
+% Queries
+?- height(a, H).
+false.
+
+6. Ancestor Search with Path
+% Facts
+parent(a, b).
+parent(b, c).
+parent(c, d).
+% Rules
+ancestor(X, Y, [X|Path]) :- parent(X, Y), Path = [].
+ancestor(X, Y, [X|Path]) :- parent(X, Z), ancestor(Z, Y, Path).
+% Queries
+?- ancestor(a, d, Path).
+Path = [a, b, c] .
+
+7. Common Ancestor
+% Facts
+parent(a, b).
+parent(a, c).
+parent(b, d).
+parent(c, e).
+% Rules
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
+common_ancestor(X, Y, A) :- ancestor(A, X), ancestor(A, Y).
+% Queries
+?- common_ancestor(d, e, A).
+A = a .
+
+8. Binary Search Tree Insertion
+% Facts
+bst(nil).
+% Rules
+bst_insert(nil, X, tree(X, nil, nil)).
+bst_insert(tree(Root, Left, Right), X, tree(Root, Left1, Right)) :- X =< Root, bst_insert(Left, X, Left1).
+bst_insert(tree(Root, Left, Right), X, tree(Root, Left, Right1)) :- X > Root, bst_insert(Right, X, Right1).
+% Queries
+?- bst_insert(nil, 5, T), bst_insert(T, 3, T1), bst_insert(T1, 7, T2).
+T = tree(5, nil, nil),
+T1 = tree(5, tree(3, nil, nil), nil),
+T2 = tree(5, tree(3, nil, nil), tree(7, nil, nil)) .
+
+9. Mirror of Binary Tree
+% Facts
+parent(a, b).
+parent(a, c).
+parent(b, d).
+parent(b, e).
+% Rules
+mirror(nil, nil).
+mirror(tree(X, L1, R1), tree(X, L2, R2)) :- mirror(L1, R2), mirror(R1, L2).
+% Queries
+?- mirror(tree(a, tree(b, nil, nil), tree(c, nil, nil)), M).
+M = tree(a, tree(c, nil, nil), tree(b, nil, nil)).
+
+10. Tree Traversal: In-Order
+% Facts
+parent(a, b).
+parent(a, c).
+parent(b, d).
+parent(b, e).
+% Rules
+inorder(nil, []).
+inorder(tree(Root, Left, Right), List) :- inorder(Left, L1), inorder(Right, L2), append(L1, [Root|L2], List).
+% Queries
+?- inorder(tree(a, tree(b, nil, nil), tree(c, nil, nil)), L).
+L = [b, a, c].
+
+11. Finding Maximum Element in a Binary Tree
+% Facts
+tree(tree(1, tree(2, nil, nil), tree(3, nil, nil))).
+% Rules
+max_tree(tree(X, nil, nil), X).
+max_tree(tree(X, L, R), Max) :- max_tree(L, MaxL), max_tree(R, MaxR), Max is max(X, max(MaxL, MaxR)).
+% Queries
+?- max_tree(tree(1, tree(2, nil, nil), tree(3, nil, nil)), Max).
+Max = 3 .
+
+12. Subtree Search
+% Facts
+tree(a, tree(b, nil, nil), tree(c, nil, nil)).
+% Rules
+subtree(T, tree(T, _, _)).
+subtree(T, tree(_, L, _)) :- subtree(T, L).
+subtree(T, tree(_, _, R)) :- subtree(T, R).
+% Queries
+?- subtree(tree(b, nil, nil), tree(a, tree(b, nil, nil), tree(c, nil, nil))).
+false.
+
+13. Depth of a Node
+% Facts
+parent(a, b).
+parent(a, c).
+parent(b, d).
+% Rules
+depth(X, Y, 0) :- X = Y.
+depth(X, Y, D) :- parent(X, Z), depth(Z, Y, D1), D is D1 + 1.
+% Queries
+?- depth(a, d, Depth).
+Depth = 2 .
+
+14. Balanced Binary Tree
+% Facts
+parent(a, b).
+parent(a, c).
+% Rules
+height(nil, 0).
+height(tree(_, L, R), H) :- height(L, LH), height(R, RH), H is max(LH, RH) + 1.
+balanced(nil).
+balanced(tree(_, L, R)) :- balanced(L), balanced(R), height(L, LH), height(R, RH), abs(LH - RH) =< 1.
+% Queries
+?- balanced(tree(a, tree(b, nil, nil), tree(c, nil, nil))).
+true.
+
+15. Leftmost Node in Binary Tree
+% Facts
+parent(a, b).
+parent(b, d).
+% Rules
+leftmost(X, X) :- \+ parent(X, _).
+leftmost(X, Y) :- parent(X, Z), leftmost(Z, Y).
+% Queries
+?- leftmost(a, L).
+L = d .
+
